@@ -25,7 +25,7 @@ class Game:
         self.maxTemp = 0
         self.minTemp = 0
 
-        self.__updateMinMaxTemps() 
+        self.updateColors() 
 
     # Private methods for internal use
 
@@ -47,6 +47,7 @@ class Game:
         for i in xrange(self.total):
             randTemp = random() * self.TEMP_MAX
             newCylinder = Cylinder(randTemp, Placement.SLOW)
+
             self.cylinders.append(newCylinder)
 
         # Pick random cylinders to be placed in fast storage
@@ -56,13 +57,20 @@ class Game:
             self.cylinders[i].setPlacement(Placement.FAST)
             
     # Returns a number from {1,...,10} representing the color based on the temperature
-    def __computeColorBucket(self,cylinder):
+    def __computeColorBucket(self, cylinder):
         # Get relative position of temperature in terms of range [0, 1]
-        pos = double(cylinder.getTemperature() - self.minTemp) / (maxTemp - minTemp)
+        pos = float(cylinder.getTemperature() - self.minTemp) / (self.maxTemp - self.minTemp)
 
-        return pos * 10 # Shift to range [0, 10]
+        return int(pos * 10) # Shift to range [0, 10]
 
     # Public Methods
+
+    # Updates the color values of the cylinders
+    def updateColors(self):
+        self.__updateMinMaxTemps()
+
+        for cylinder in self.cylinders:
+            cylinder.setColorBucket(self.__computeColorBucket(cylinder))
 
     # Sets the date string
     def setDate(self, date):
