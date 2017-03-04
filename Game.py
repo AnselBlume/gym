@@ -25,20 +25,21 @@ class Game:
         self.maxTemp = 0
         self.minTemp = 0
 
-        self.__setMinMaxTemps() 
+        self.__updateMinMaxTemps() 
 
     # Private methods for internal use
-    def __setMinMaxTemps(self):
-     '''   for cylinder in cylinders:
-            if cylinder.getTemperature()>self.maxTemp:
-                self.maxTemp=cylinder.getTemperature()
-                pass
-            pass
-        for cylinder in cylinders:
-            if cylinder.getTemperature()<self.minTemp:
-                self.minTemp=cylinder.getTemperature()
-                pass
-            pass'''
+
+    # Updates max and min temperatures in the cylinders array
+    def __updateMinMaxTemps(self):
+        self.minTemp = self.maxTemp = self.cylinders[0].getTemperature()
+
+        for cylinder in self.cylinders:
+            temperature = cylinder.getTemperature()
+
+            if temperature > self.maxTemp: 
+                self.maxTemp = temperature
+            elif temperature < self.minTemp:
+                self.minTemp = temperature
 
     # Initializes the game with cylinders with ranodm temperatures and locations
     def __initRandomCylinders(self):
@@ -51,11 +52,15 @@ class Game:
         # Pick random cylinders to be placed in fast storage
         moveToFast = sample(xrange(self.total), self.fast_size)
 
-        print str(moveToFast)
-
         for i in moveToFast:
             self.cylinders[i].setPlacement(Placement.FAST)
             
+    # Returns a number from {1,...,10} representing the color based on the temperature
+    def __computeColorBucket(self,cylinder):
+        # Get relative position of temperature in terms of range [0, 1]
+        pos = double(cylinder.getTemperature() - self.minTemp) / (maxTemp - minTemp)
+
+        return pos * 10 # Shift to range [0, 10]
 
     # Public Methods
 
@@ -89,22 +94,14 @@ class Game:
     def fitness(self):
         """returns number 0.0 - 1.0"""
         pass
-    def bucket(self,cylinder):
-        bucket=math.floor((cylinder.getTemperature()-minTemp)/(maxTemp-minTemp))
-        pass
-    def updateMax(self,cylinder):
-        if cylinder.getTemperature()>self.maxTemp:
-                self.maxTemp=cylinder.getTemperature()
-                pass
-        pass
-    def updateMin(self,cylinder):
-        if cylinder.getTemperature()<self.minTemp:
-                self.minTemp=cylinder.getTemperature()
-                pass
-        pass
+
+
 
 if __name__ == "__main__":
     game = Game(10, 3)
 
     for cylinder in game.cylinders:
         print str(cylinder)
+
+    print "MaxTemp: " + str(game.maxTemp)
+    print "MinTemp: " + str(game.minTemp)
