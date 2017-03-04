@@ -11,6 +11,24 @@ class Cylinder:
 		self.placement = placement
 		self.bucket = -1
 
+	# String representation of this Cylinder
+	def __str__(self):
+		placement = ""
+
+		if self.placement == Placement.FAST:
+			placement = "FAST"
+		elif self.placement == Placement.SLOW:
+			placement = "SLOW"
+		else:
+			placement = "NONE"
+
+		return "Cylinder\n"\
+			   + "--------\n"\
+			   + "Temperature: " + str(self.temperature) + "\n"\
+			   + "Placement: " + placement + "\n"\
+			   + "Bucket: " + str(self.bucket) + "\n"
+
+
 	# Gets the current temperature of this Cylinder
 	def getTemperature(self):
 		return self.temperature
