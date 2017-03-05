@@ -6,17 +6,20 @@ class Game:
     # Maximum random temperature to initialize the cylinders to
     TEMP_MAX = 1000
 
-    # Date for the current frame
-    date = ""
-
-    # List of cylinders
-    cylinders = []
-
-    """total: total number of cylinders 
-    fast_size: size of fast portion"""
-    def __init__(self, total, fast_size):
+    # total: Total number of cylinders 
+    # fastSize: Number of cylinders that can go in fast storage
+    def __init__(self, total, fastSize):
         self.total = total
-        self.fast_size = fast_size
+        self.fastSize = fastSize
+
+        # Date for the current frame
+        self.date = ""
+
+        # List of cylinders
+        self.cylinders = []
+
+        # List of fast cylinders
+        self.fastCylinders = []
 
         # Initialize Game with cylinders with random temperatures and locations
         self.__initRandomCylinders()
@@ -51,10 +54,11 @@ class Game:
             self.cylinders.append(newCylinder)
 
         # Pick random cylinders to be placed in fast storage
-        moveToFast = sample(xrange(self.total), self.fast_size)
+        moveToFast = sample(xrange(self.total), self.fastSize)
 
         for i in moveToFast:
             self.cylinders[i].setPlacement(Placement.FAST)
+            self.fastCylinders.append(i)
             
     # Returns a number from {1,...,10} representing the color based on the temperature
     def __computeColorBucket(self, cylinder):
@@ -80,30 +84,42 @@ class Game:
     def getDate(self):
         return self.date
 
-    def swap(self, i, j):
-        """swapping rectangle i with rectangle j"""
-        pass
+    # Swaps the placements of the cylinders in slow/fast storage
+    # i.e. If the cylinder at cylinder1Index is fast and that at cylinder2Index
+    # is slow, then cylinder1Index will be slow and cylinder2Index will be fast
+    def swap(self, cyl1Index, cyl2Index):
+        cyl1Plce = self.cylinders[cyl1Index].getPlacement()
+        cyl2Plce = self.cylinders[cyl2Index].getPlacement()
+
+        # Update fast cylinders list if 
+        if cyl1Plce == Placement.SLOW and cyl2Plce == Placement.FAST:
+            self.fastCylinders.remove(cyl2Index)
+            self.fastCylinders.append(cyl1Index)
+        elif cyl1Plce == Placement.FAST and cyl2Plce == Placement.SLOW:
+            self.fastCylinders.remove(cyl1Index)
+            self.fastCylinders.append(cyl2Index)
+
+        self.cylinders[cyl1Index].setPlacement(cyl2Plce)
+        self.cylinders[cyl2Index].setPlacement(cyl1Plce)
 
     def change_color(self, i, color):
         """color is... something"""
 
-    def get_states(self, i):
-        """returns: array of numbers"""
-        pass
+    # Returns a list of all the cylinders
+    def getCylinders(self):
+        return self.cylinders;
 
-    def get_fast_states(self):
-        """returns: array of numbers"""
-        pass
+    # Returns a list of the indices of the fast cylinders
+    def getFastCylinderIndices(self):
+        return self.fastCylinders
 
-    def get_slow_states(self):
-        """returns: array of numbers"""
-        pass
+    # Returns a list of the indices of the slow cylinders
+    def getSlowCylinderIndices(self):
+        return [index for index in range(self.total) if index not in self.fastCylinders]
 
     def fitness(self):
         """returns number 0.0 - 1.0"""
         pass
-
-
 
 if __name__ == "__main__":
     game = Game(10, 3)
@@ -113,3 +129,15 @@ if __name__ == "__main__":
 
     print "MaxTemp: " + str(game.maxTemp)
     print "MinTemp: " + str(game.minTemp)
+
+    print "Fast cylinders: " + str(game.getFastCylinderIndices())
+    print "Slow cylinders: " + str(game.getSlowCylinderIndices())
+
+    print "\nSWAPPING PLACEMENTS OF INDICES 0 AND 1\n"
+    game.swap(0, 1)
+
+    for cylinder in game.cylinders:
+        print str(cylinder)
+
+    print "Fast cylinders: " + str(game.getFastCylinderIndices())
+    print "Slow cylinders: " + str(game.getSlowCylinderIndices())
