@@ -1,7 +1,6 @@
 from Cylinder import *
 from random import random, sample
 
-# TODO: everything
 class Game:
     # Maximum random temperature to initialize the cylinders to
     TEMP_MAX = 1000
@@ -29,6 +28,9 @@ class Game:
         self.minTemp = 0
 
         self.updateColors() 
+
+        # Have the temperatures changed since the last updateColors call
+        self.haveTempsChanged = False
 
     # Private methods for internal use
 
@@ -102,8 +104,19 @@ class Game:
         self.cylinders[cyl1Index].setPlacement(cyl2Plce)
         self.cylinders[cyl2Index].setPlacement(cyl1Plce)
 
-    def change_color(self, i, color):
-        """color is... something"""
+    # Sets the temperature of a cylinder at the given index
+    def setTemperatureAt(self, index, temperature):
+        self.cylinders[index].setTemperature(temperature)
+        self.haveTempsChanged = True
+
+
+    # Gets the color bucket of the cylinder at the given index
+    def getColorAt(self, index):
+        if self.haveTempsChanged:
+            self.updateColors()
+            self.haveTempsChanged = False
+
+        return self.cylinders[index].getColorBucket()
 
     # Returns a list of all the cylinders
     def getCylinders(self):
@@ -117,14 +130,11 @@ class Game:
     def getSlowCylinderIndices(self):
         return [index for index in range(self.total) if index not in self.fastCylinders]
 
-    def fitness(self):
-        """returns number 0.0 - 1.0"""
-        pass
-
+# Testing main method
 if __name__ == "__main__":
     game = Game(10, 3)
 
-    for cylinder in game.cylinders:
+    for cylinder in game.getCylinders():
         print str(cylinder)
 
     print "MaxTemp: " + str(game.maxTemp)
@@ -136,8 +146,18 @@ if __name__ == "__main__":
     print "\nSWAPPING PLACEMENTS OF INDICES 0 AND 1\n"
     game.swap(0, 1)
 
-    for cylinder in game.cylinders:
+    for cylinder in game.getCylinders():
         print str(cylinder)
 
     print "Fast cylinders: " + str(game.getFastCylinderIndices())
     print "Slow cylinders: " + str(game.getSlowCylinderIndices())
+
+    print "\nSetting cylinder at index 0's temperature to 9999"
+    game.setTemperatureAt(0, 9999)
+
+    print str(game.getCylinders()[0])
+
+    print "Getting color of cylinder at index 0"
+    print game.getColorAt(0)
+
+    print str(game.getCylinders()[0])
