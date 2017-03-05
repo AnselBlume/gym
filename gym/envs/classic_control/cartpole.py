@@ -48,11 +48,37 @@ class CartPoleEnv(gym.Env):
 
         self.steps_beyond_done = None
 
+        dataFile = open('history.csv', 'r')
+
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
     def _step(self, action):
+
+        
+        #Reads in a text file
+        #Format of .txt file: index, temp, date
+        #Index: index to be updated
+        #Temp: temp to change
+        #Date: String Date
+
+        #Read first line
+        dataList = dataFile.readline().split(', ')
+        prevDate = dataList[2]
+        currentDate = prevDate
+
+        #cylinder[dataList[0]].setTemperature(int(dataList[1]))
+
+        #Loop through the rest of the text file until Date changes
+        while currentDate == prevDate:
+            dataList = dataFile.readline().split(', ')
+            prevDate = dataList[2]
+
+            if currentDate == prevDate:
+                #cylinder[dataList[0]].setTemperature(int(dataList[1]))   
+
+
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
         state = self.state
         x, x_dot, theta, theta_dot = state
