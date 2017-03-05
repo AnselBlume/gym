@@ -66,13 +66,14 @@ class CartPoleEnv(gym.Env):
         #Index: index to be updated
         #Temp: temp to change
         #Date: String Date
-
+        
         #Read first 
         dataList = self.dataFile.readline().split(',')
         prevDate = dataList[2]
         currentDate = prevDate
 
-        #cylinder[dataList[0]].setTemperature(int(dataList[1]))
+        self.game.cylinders[dataList[0]].setTemperature(int(dataList[1]))
+        
 
         #Loop through the rest of the text file until Date changes
         while currentDate == prevDate:
