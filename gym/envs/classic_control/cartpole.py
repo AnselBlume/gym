@@ -2,7 +2,10 @@
 Classic cart-pole system implemented by Rich Sutton et al.
 Copied from https://webdocs.cs.ualberta.ca/~sutton/book/code/pole.c
 """
-
+import Game
+from Game import *
+from Cylinder import *
+from random import random, sample
 import logging
 import math
 import gym
@@ -49,6 +52,7 @@ class CartPoleEnv(gym.Env):
         self.steps_beyond_done = None
 
         self.dataFile = open('history.csv', 'r')
+        self.game=self.makeGame()
 
     def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -76,7 +80,7 @@ class CartPoleEnv(gym.Env):
             prevDate = dataList[2]
 
             if currentDate == prevDate:
-                cylinder[dataList[0]].setTemperature(int(dataList[1]))   
+                self.game.cylinders[int(dataList[0])].setTemperature(int(dataList[1]))   
                 assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
         state = self.state
         x, x_dot, theta, theta_dot = state
@@ -167,3 +171,35 @@ class CartPoleEnv(gym.Env):
         self.poletrans.set_rotation(-x[2])
 
         return self.viewer.render(return_rgb_array = mode=='rgb_array')
+    def makeGame(self):
+        game = Game(10, 3)
+
+        for cylinder in game.getCylinders():
+            print str(cylinder)
+
+        print "MaxTemp: " + str(game.maxTemp)
+        print "MinTemp: " + str(game.minTemp)
+
+        print "Fast cylinders: " + str(game.getFastCylinderIndices())
+        print "Slow cylinders: " + str(game.getSlowCylinderIndices())
+
+        print "\nSWAPPING PLACEMENTS OF INDICES 0 AND 1\n"
+        game.swap(0, 1)
+
+        for cylinder in game.getCylinders():
+            print str(cylinder)
+
+        print "Fast cylinders: " + str(game.getFastCylinderIndices())
+        print "Slow cylinders: " + str(game.getSlowCylinderIndices())
+
+        print "\nSetting cylinder at index 0's temperature to 9999"
+        game.setTemperatureAt(0, 9999)
+
+        print str(game.getCylinders()[0])
+
+        print "Getting color of cylinder at index 0"
+        print game.getColorAt(0)
+
+        print str(game.getCylinders()[0])
+        return game
+
